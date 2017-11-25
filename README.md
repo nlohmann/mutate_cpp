@@ -1,8 +1,8 @@
 # Mutate++ - A C++ Mutation Test Environment
 
 [Mutation testing](https://en.wikipedia.org/wiki/Mutation_testing) is a technique to detect bugs in a program by
-changing its soure code (called "mutation") and checking whether the program's test suite detects this mutation. The
-mutations are designed to mimick typical programming errors (e.g., off-by-one errors). If such errors are not noticed
+changing its source code (called "mutation") and checking whether the program's test suite detects this mutation. The
+mutations are designed to mimic typical programming errors (e.g., off-by-one errors). If such errors are not noticed
 by the test suite, the "survived" mutation can be used to create an additional test that would detect it.
 
 - [Overview](#overview)
@@ -76,7 +76,7 @@ cd build
 cmake ..
 ```
 
-We now have three directories we will be refering to later:
+We now have two directories we will be referring to later:
 
 - the working directory `/tmp/cmake-example/build`: this is the directory where we will execute the build and test
   commands
@@ -153,7 +153,7 @@ inspect them back clicking on ["14 patches"](http://127.0.0.1:5000/projects/1/pa
 this overview, you see the individual patches with their line, kind, state and confirmation:
 
 - The kind describes the nature of the patch, e.g. "lineDeletion" or "arithmeticOperator". If you click on a kind, the
-  list of patches will be filteted accordingly.
+  list of patches will be filtered accordingly.
 - The state describes whether the patch was analyzed so far; that is, whether the code has been mutated accordingly and
   the test suite has been executed. So far, all patches are incomplete.
 - The confirmation describes whether you have been evaluated the results so far. All patches are "unknown" so far.
@@ -197,7 +197,7 @@ Go back to the [project overview](http://127.0.0.1:5000/projects/1) by clicking 
 
 The Patches second got more colorful now. We see a graph that describes the breakdown of the patches:
 
-- 14 patches were genereated in total.
+- 14 patches were generated in total.
 - 13 patches were killed; meaning they have been detected by the test suite or the code did not compile.
 - 13 of these patches were killed due to a failure. There are other reasons a patch could have been killed which we
   describe later.
@@ -254,9 +254,9 @@ In the [project overview](http://127.0.0.1:5000/projects/1), you also get some s
 
 ## Help!
 
-Mutate++ is in a very early stage, and there is a lot to do. In particular, we are aware of severy limitations:
+Mutate++ is in a very early stage, and there is a lot to do. In particular, we are aware of severe limitations:
 
-- Mutations are created very naively on a purely syntactial level and often result in code that fails compilation.
+- Mutations are created very naively on a purely syntactical level and often result in code that fails compilation.
   Using, for instance, LLVM-based tools could help to use more type information to create mutations which are more
   likely to result in valid C++ programs.
 - The web app has a terrible UX, and should be overworked by someone who knows more about this...
