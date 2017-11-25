@@ -1,0 +1,68 @@
+{% extends "v2_base.html" %}
+{% set title='Create project' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item active">Create project</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Create project</h1>
+
+    <form action="" method="post" name="project">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            <label for="name">Project name</label>
+            {{ form.name(class_='form-control') }}
+             <p class="form-text text-muted">Name of the project.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Working directory</label>
+            {{ form.workdir(class_='form-control') }}
+             <p class="form-text text-muted">The absolute path of a working directory in which the commands will be executed.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Build command</label>
+            {{ form.build_command(class_='form-control') }}
+             <p class="form-text text-muted">The command to build the project.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Quickcheck command</label>
+            {{ form.quickcheck_command(class_='form-control') }}
+             <p class="form-text text-muted">The command to execute a quick check (optional).</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Quickcheck timeout</label>
+            {{ form.quickcheck_timeout(class_='form-control') }}
+             <p class="form-text text-muted">Timeout for the quick check (optional).</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Test command</label>
+            {{ form.test_command(class_='form-control') }}
+             <p class="form-text text-muted">The command to execute the test suite.</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Test timeout</label>
+            {{ form.test_timeout(class_='form-control') }}
+             <p class="form-text text-muted">Timeout for the test suite (optional).</p>
+        </div>
+
+        <div class="form-group">
+            <label for="name">Clean command</label>
+            {{ form.clean_command(class_='form-control') }}
+             <p class="form-text text-muted">Command to clean after executing the test suite (optional).</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Create project</button>
+    </form>
+{% endblock %}

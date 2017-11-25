@@ -1,0 +1,27 @@
+{% extends "v2_base.html" %}
+{% set title='Add file to project' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active">Add file to project</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Add file to project</h1>
+
+    <form action="" method="post" name="project">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            <label for="filename">File name</label>
+            {{ form.filename(class_='form-control') }}
+             <p class="form-text text-muted">Absolute path of the file.</p>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add file</button>
+    </form>
+{% endblock %}

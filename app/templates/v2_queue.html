@@ -1,0 +1,120 @@
+{% extends "v2_base.html" %}
+{% set title='Queue' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item active">Queue</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Queue</h1>
+
+    <p>
+    {% if executor.running %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('route_v2_queue_stop') }}">
+            <i class="fa fa-pause" aria-hidden="true"></i> pause</a>
+
+        {% set additional_bar_class = ' progress-bar-striped progress-bar-animated' %}
+    {% elif executor.current_patch %}
+        <a class="btn btn-primary btn-lg disabled" href="{{ url_for('route_v2_queue_start') }}">
+            <i class="fa fa-pause" aria-hidden="true"></i> pausing...</a>
+    {% else %}
+        <a class="btn btn-primary btn-lg" href="{{ url_for('route_v2_queue_start') }}">
+            <i class="fa fa-play" aria-hidden="true"></i> resume</a>
+    {% endif %}
+    </p>
+
+    <p>current patch: {{ executor.current_patch }}</p>
+
+    <p>todo: {{ executor.count }} patches</p>
+
+    {% set stats = stats.run_stats() %}
+    {% set patch_finished_percentage = 100.0 * ((stats.patch.count._all_ - stats.patch.count.incomplete) / stats.patch.count._all_) %}
+
+    <div class="progress">
+        <div class="progress-bar{{ additional_bar_class }}" role="progressbar" style="width: {{ patch_finished_percentage }}%">
+            {{ stats.patch.count.killed + stats.patch.count.survived }}
+        </div>
+    </div>
+
+    {% if executor.count > 0 %}
+    <small>
+    <span class="float-left" style="margin-left: {{ patch_finished_percentage }}%; padding-right: 1em;">now</span>
+    <span class="float-right">{{ stats.eta|humanize }}</span>
+    </small>
+    {% endif %}
+
+
+    <p>&nbsp;</p>
+
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th>Patch</th>
+            <th>Project</th>
+            <th>File</th>
+            <th>Line</th>
+            <th>Kind</th>
+            <th>State</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for patch in patches.items %}
+            {% if executor.current_patch and (patch.id == executor.current_patch.id) %}
+                {% if executor.running %}
+                <tr class="table-primary">
+                {% else %}
+                <tr class="table-secondary">
+                {% endif %}
+            {% else %}
+                <tr>
+            {% endif %}
+        <td>
+            <a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=patch.project_id, patch_id=patch.id) }}">{{ patch.id }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('route_v2_project_project_id', project_id=patch.project_id) }}">{{ patch.project.name }}</a>
+        </td>
+        <td>
+            <a href="{{ url_for('route_v2_project_project_id_files_file_id', project_id=patch.project_id, file_id=patch.file_id) }}">{{ patch.file.filename|basename }}</a>
+        </td>
+        <td>{{ patch.line }}</td>
+        <td>{{ patch.kind }}</td>
+        <td>{{ patch.state }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item{% if not patches.has_prev %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_queue', page=patches.prev_num) }}">
+                    <span>&laquo;</span>
+                </a>
+            </li>
+
+            {% for page in patches.iter_pages() %}
+                {% if page %}
+                <li class="page-item{% if page == patches.page %} active{% endif %}">
+                    <a class="page-link" href="{{ url_for('route_v2_queue', page=page) }}">{{ page }}</a>
+                </li>
+                {% else %}
+                    <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <li class="page-item{% if not patches.has_next %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_queue', page=patches.next_num) }}">
+                    <span>&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

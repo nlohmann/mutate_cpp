@@ -1,0 +1,76 @@
+{% extends "v2_base.html" %}
+{% set title='Mutator ' + mutator.mutator_id %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_mutators') }}">Mutators</a></li>
+        <li class="breadcrumb-item active">Mutator {{ mutator.mutator_id }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>{{ mutator.mutator_id }}</h1>
+
+    <p>{{ mutator.description }}</p>
+
+    <p>Tags:
+    {% for tag in mutator.tags %}
+        <span class="badge badge-primary">{{ tag }}</span>
+    {% endfor %}
+    </p>
+
+
+    <h2>Patches</h2>
+
+    <table class="table table-sm">
+    <thead>
+    <tr>
+        <th>Patch</th>
+        <th>Project</th>
+        <th>State</th>
+        <th>Command</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for patch in patches.items %}
+    <tr>
+        <td><a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=patch.project_id, patch_id=patch.id) }}">{{ patch.id }}</a></td>
+        <td>{{ patch.project_id }}</td>
+        <td>{{ patch.state }}</td>
+        <td>{{ patch.killed_stage }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item{% if not patches.has_prev %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=mutator.mutator_id, page=patches.prev_num) }}">
+                    <span>&laquo;</span>
+                </a>
+            </li>
+
+            {% for page in patches.iter_pages() %}
+                {% if page %}
+                <li class="page-item{% if page == patches.page %} active{% endif %}">
+                    <a class="page-link" href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=mutator.mutator_id, page=page) }}">{{ page }}</a>
+                </li>
+                {% else %}
+                    <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <li class="page-item{% if not patches.has_next %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=mutator.mutator_id, page=patches.next_num) }}">
+                    <span>&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}

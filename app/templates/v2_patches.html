@@ -1,0 +1,95 @@
+{% extends "v2_base.html" %}
+{% set title='Patches' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a></li>
+        {% if request.args.get('patch_state') %}
+            <li class="breadcrumb-item"><a href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id) }}">Patches</a></li>
+        <li class="breadcrumb-item active">{{ request.args.get('patch_state') }}</li>
+        {% else %}
+        <li class="breadcrumb-item active">Patches</li>
+        {% endif %}
+    </ol>
+{% endblock %}
+
+{% block content %}
+<h1>Patches</h1>
+
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th>patch</th>
+            <th>line</th>
+            <th>kind</th>
+            <th>state</th>
+            <th>confirmation</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for patch in patches.items %}
+            <tr>
+                <td>
+                    <a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=patch.id) }}">{{ patch.id }}</a>
+                </td>
+                <td>{{ patch.line }}</td>
+                <td><a href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=patch.kind) }}">{{ patch.kind }}</a></td>
+                <td>
+                    {% if patch.state == 'killed' %}
+                        <span class="badge badge-success">
+                    {% elif patch.state == 'survived' %}
+                        <span class="badge badge-danger">
+                    {% else %}
+                        <span class="badge badge-secondary">
+                    {% endif %}
+                    {{ patch.state }}</span>
+                </td>
+            <td>
+                {% if patch.confirmation == 'confirmed' %}
+                        <span class="badge badge-danger">
+                {% elif patch.confirmation == 'ignored' %}
+                        <span class="badge badge-success">
+                {% elif patch.confirmation == 'unknown' %}
+                        <span class="badge badge-warning">
+                {% endif %}
+                {{ patch.confirmation }}</span>
+            </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+    <nav>
+        <ul class="pagination">
+            <li class="page-item{% if not patches.has_prev %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.prev_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">
+                    <span>&laquo;</span>
+                </a>
+            </li>
+
+            {% for page in patches.iter_pages() %}
+                {% if page %}
+                <li class="page-item{% if page == patches.page %} active{% endif %}">
+                    <a class="page-link" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=page, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">{{ page }}</a>
+                </li>
+                {% else %}
+                    <li class="page-item disabled">
+                    <a class="page-link" href="#">...</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+
+            <li class="page-item{% if not patches.has_next %} disabled{% endif %}">
+                <a class="page-link"
+                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.next_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">
+                    <span>&raquo;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+{% endblock %}

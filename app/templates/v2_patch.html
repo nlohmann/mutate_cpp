@@ -1,0 +1,87 @@
+{% extends "v2_base.html" %}
+{% set title='Patch ' + patch.id|string %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id) }}">Patches</a></li>
+        <li class="breadcrumb-item active">Patch {{ patch.id }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Patch {{ patch.id }}</h1>
+
+    <h2>Patch</h2>
+    <pre><code class="diff">{{ patch.patch }}</code></pre>
+
+    <h2>Description</h2>
+    {% set patch_description = mutators[patch.kind].description %}
+
+    <p>The patch is of kind <a href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=patch.kind) }}">{{ patch.kind }}</a> and {{ patch_description[0]|lower }}{{ patch_description[1:] }}</p>
+
+    {% if patch.code_replacement is not none %}
+        <p>In line {{ patch.line }} of file {{ patch.file.filename|basename }}, <kbd>{{ patch.code_original|striptext }}</kbd> was replaced with <kbd>{{ patch.code_replacement|striptext }}</kbd>.</p>
+    {% else %}
+        <p>Line {{ patch.line }} of file {{ patch.file.filename|basename }} (<kbd>{{ patch.code_original|striptext }}</kbd>) was deleted.</p>
+    {% endif %}
+
+    {% if patch.state == 'killed' %}
+        <p>The patch has been detected running the {{ patch.killed_stage }}.</p>
+    {% elif patch.state == 'survived' %}
+        <p>The patch has survived.</p>
+    {% else %}
+        <p>The patch has not yet been investigated.</p>
+    {% endif %}
+
+    {% if patch.state != 'incomplete' %}
+    <p>The evaluation took {{ patch.runtime|round(2) }} seconds.</p>
+    {% endif %}
+
+    <h2>Confirmation</h2>
+
+    <p>Confirmation is {{ patch.confirmation }}.</p>
+
+    <form action="" method="post" name="project">
+        {{ form.hidden_tag() }}
+
+        {% for x in form.confirmation %}
+            <div class="form-check">
+                <label class="form-check-label">
+                    {{ x }} {{ x.data }}
+                </label>
+            </div>
+        {% endfor %}
+
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+
+    <h2>Runs</h2>
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th>run</th>
+            <th>duration</th>
+            <th>command</th>
+            <th>success</th>
+            <th>log</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for run in patch.runs %}
+            <tr>
+                <td><a href="{{ url_for('route_v2_project_project_id_patches_patch_id_runs_run_id', project_id=project.id, patch_id=patch.id, run_id=run.id) }}">{{ run.id }}</a></td>
+                <td>{{ run.duration|round(2) }}</td>
+                <td>{{ run.command }}</td>
+                <td>{{ run.success }}</td>
+                <td>{{ run.log }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

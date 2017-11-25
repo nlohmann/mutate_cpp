@@ -1,0 +1,23 @@
+@startuml
+(*) --> if "mutations exist" then
+-->[yes] "mutate source code"
+--> "execute build command"
+
+if "build succeeds" then
+-->[yes] "execute test command"
+    if "tests succeeds" then
+    -->[yes] "<color:red>mutation survived</color>"
+    --> "update status"
+    else
+    -->[no] "<color:green>mutation killed</color>"
+    endif
+else
+-->[no] "<color:green>mutation killed</color>"
+endif
+--> "update status"
+--> "mutate source code"
+else
+-->[no] (*)
+endif
+
+@enduml

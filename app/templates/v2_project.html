@@ -1,0 +1,310 @@
+{% extends "v2_base.html" %}
+{% set title='Project ' + project.name %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item active">{{ project.name }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>
+        <small class="text-muted">Project</small>
+        <br>{{ project.name }}
+    </h1>
+
+    <h2 class="pt-5">Workflow</h2>
+
+    <table>
+        <tr>
+            <td>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">build</h5>
+                        <p class="card-text">
+                            <kbd>{{ project.build_command }}</kbd>
+                        </p>
+                    </div>
+                </div>
+            </td>
+            {% if project.quickcheck_command %}
+            <td><i class="fa fa-arrow-right px-2" aria-hidden="true"></i></td>
+            <td>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">quickcheck</h5>
+                        <p class="card-text">
+                            <kbd>{{ project.quickcheck_command }}</kbd>
+                            <br>
+                            <small>
+                                {{ project.quickcheck_timeout }} seconds timeout
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </td>
+            {% endif %}
+            <td><i class="fa fa-arrow-right px-2" aria-hidden="true"></i></td>
+            <td>
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">test</h5>
+                        <p class="card-text">
+                            <kbd>{{ project.test_command }}</kbd>
+                            <br>
+                            <small>
+                                {{ project.test_timeout }} seconds timeout
+                            </small>
+                        </p>
+                    </div>
+                </div>
+            </td>
+            {% if project.clean_command|length %}
+                <td><i class="fa fa-arrow-right px-2" aria-hidden="true"></i></td>
+                <td>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">clean up</h5>
+                            <p class="card-text">
+                                <kbd>{{ project.clean_command }}</kbd>
+                            </p>
+                        </div>
+                    </div>
+                </td>
+            {% endif %}
+        </tr>
+    </table>
+
+    <p>
+        <i class="fa fa-folder-open-o" aria-hidden="true"></i> working directory {{ project.workdir }}
+    </p>
+
+    <h2 class="pt-5">Files</h2>
+
+    {% set files = project.files.all() %}
+
+    {% if files|length %}
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th>filename</th>
+                <th>patches</th>
+                <th>actions</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for file in files %}
+                <tr>
+                    <td><i class="fa fa-file-code-o"></i> <a
+                            href="{{ url_for('route_v2_project_project_id_files_file_id', project_id=project.id, file_id=file.id) }}">{{ file.filename|basename }}</a>
+                    </td>
+                    <td>
+                        {{ file.patches.count() }} patches,
+
+                        <a class="btn btn-primary btn-sm" role="button"
+                           href="{{ url_for('route_v2_project_project_id_files_file_id_generate', project_id=project.id, file_id=file.id) }}">generate
+                            patches</a>
+                    </td>
+                    <td>
+                        <a class="btn btn-danger btn-sm" role="button"
+                           href="{{ url_for('route_v2_project_project_id_files_file_id_delete', project_id=project.id, file_id=file.id) }}">remove
+                            file</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No files have been added yet.</p>
+    {% endif %}
+
+    <p><a class="btn btn-primary" role="button" href="{{ url_for('route_v2_project_project_id_files_add', project_id=project.id) }}">Add file</a></p>
+
+    <h2 class="pt-5">Patches</h2>
+
+        {% set run_stats = stats.run_stats(project.id) %}
+
+        {% if run_stats.patch.count._all_ %}
+        <div class="tree">
+        <ul>
+            <li><a href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id) }}">{{ run_stats.patch.count._all_ }} patches</a>
+                <ul>
+                    {% if run_stats.patch.count.incomplete %}
+                    <li>
+                        <a href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='incomplete') }}">{{ run_stats.patch.count.incomplete }} incomplete</a>
+                    </li>
+                    {% endif %}
+                    {% if run_stats.patch.count.killed %}
+                    <li>
+                        <a class="bg-success text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='killed') }}">{{ run_stats.patch.count.killed }} killed</a>
+                        <ul>
+                            {% if run_stats.run.count._all_.failure %}
+                            <li>
+                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.failure }} failure</a>
+                            </li>
+                            {% endif %}
+                        {% if run_stats.run.count._all_.nochange %}
+                            <li>
+                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.nochange }} nochange</a>
+                            </li>
+                        {% endif %}
+                        {% if run_stats.run.count._all_.timeout %}
+                            <li>
+                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.timeout }} timeout</a>
+                            </li>
+                        {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
+                {% if run_stats.patch.count.survived %}
+                    <li>
+                        <a class="bg-danger text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='survived') }}">{{ run_stats.patch.count.survived }} survived</a>
+                        <ul>
+                            {% if run_stats.patch.count.ignored %}
+                            <li>
+                                <a class="bg-success text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='survived', confirmation_state='ignored') }}">{{ run_stats.patch.count.ignored }} ignored</a>
+                            </li>
+                            {% endif %}
+                            {% if run_stats.patch.count.unknown %}
+                            <li>
+                                <a class="bg-warning" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='survived', confirmation_state='unknown') }}">{{ run_stats.patch.count.unknown }} unknown</a>
+                            </li>
+                            {% endif %}
+                            {% if run_stats.patch.count.confirmed %}
+                            <li>
+                                <a class="bg-danger text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='survived', confirmation_state='confirmed') }}">{{ run_stats.patch.count.confirmed }} confirmed</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </li>
+                {% endif %}
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="clearfix mb-5">
+    </div>
+    {% endif %}
+
+    {% if run_stats.run.count._all_.nochange == 0 %}
+        <style>.mpp-nochange { display: none; }</style>
+    {% endif %}
+    {% if run_stats.run.count._all_.timeout == 0 %}
+        <style>.mpp-timeout { display: none; }</style>
+    {% endif %}
+
+    <table class="table table-bordered">
+        <thead>
+        <tr class="active">
+            <th>command</th>
+            <th><i class="text-muted fa fa-check-circle" aria-hidden="true"></i> failure</th>
+            <th class="mpp-nochange"><i class="text-muted fa fa-files-o" aria-hidden="true"></i> nochange</th>
+            <th class="mpp-timeout"><i class="text-muted fa fa-clock-o" aria-hidden="true"></i> timeout</th>
+            <th><i class="text-muted fa fa-exclamation-triangle" aria-hidden="true"></i> success</th>
+            <th>sum</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <th class="active"><i class="text-muted fa fa-cog" aria-hidden="true"></i> build</th>
+            <td class="bg-success">{{ run_stats.run.count.build_command.failure }} runs<br>
+                {{ run_stats.run.runtime.sum.build_command.failure|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.build_command.failure|round(2) }} secs/run
+            </td>
+            <td class="mpp-nochange bg-success">{{ run_stats.run.count.build_command.nochange }} runs<br>
+                {{ run_stats.run.runtime.sum.build_command.nochange|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.build_command.nochange|round(2) }} secs/run
+            </td>
+            <td class="mpp-timeout bg-success">{{ run_stats.run.count.build_command.timeout }} runs<br>
+                {{ run_stats.run.runtime.sum.build_command.timeout|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.build_command.timeout|round(2) }} secs/run
+            </td>
+            <td class="bg-warning">{{ run_stats.run.count.build_command.success }} runs<br>
+                {{ run_stats.run.runtime.sum.build_command.success|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.build_command.success|round(2) }} secs/run
+            </td>
+            <td>{{ run_stats.run.count.build_command._all_ }} runs<br>
+                {{ run_stats.run.runtime.sum.build_command._all_|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.build_command._all_|round(2) }} secs/run
+            </td>
+        </tr>
+        <tr>
+            <th class="active"><i class="text-muted fa fa-search" aria-hidden="true"></i> quickcheck</th>
+            <td class="bg-success">{{ run_stats.run.count.quickcheck_command.failure }} runs<br>
+                {{ run_stats.run.runtime.sum.quickcheck_command.failure|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.quickcheck_command.failure|round(2) }} secs/run
+            </td>
+            <td class="mpp-nochange bg-success">{{ run_stats.run.count.quickcheck_command.nochange }} runs<br>
+                {{ run_stats.run.runtime.sum.quickcheck_command.nochange|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.quickcheck_command.nochange|round(2) }} secs/run
+            </td>
+            <td class="mpp-timeout bg-success">{{ run_stats.run.count.quickcheck_command.timeout }} runs<br>
+                {{ run_stats.run.runtime.sum.quickcheck_command.timeout|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.quickcheck_command.timeout|round(2) }} secs/run
+            </td>
+            <td class="bg-warning">{{ run_stats.run.count.quickcheck_command.success }} runs<br>
+                {{ run_stats.run.runtime.sum.quickcheck_command.success|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.quickcheck_command.success|round(2) }} secs/run
+            </td>
+            <td>{{ run_stats.run.count.quickcheck_command._all_ }} runs<br>
+                {{ run_stats.run.runtime.sum.quickcheck_command._all_|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.quickcheck_command._all_|round(2) }} secs/run
+            </td>
+        </tr>
+        <tr>
+            <th class="active"><i class="text-muted fa fa-search-plus" aria-hidden="true"></i> test</th>
+            <td class="bg-success">{{ run_stats.run.count.test_command.failure }} runs<br>
+                {{ run_stats.run.runtime.sum.test_command.failure|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.test_command.failure|round(2) }} secs/run
+            </td>
+            <td class="mpp-nochange bg-success">{{ run_stats.run.count.test_command.nochange }} runs<br>
+                {{ run_stats.run.runtime.sum.test_command.nochange|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.test_command.nochange|round(2) }} secs/run
+            </td>
+            <td class="mpp-timeout bg-success">{{ run_stats.run.count.test_command.timeout }} runs<br>
+                {{ run_stats.run.runtime.sum.test_command.timeout|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.test_command.timeout|round(2) }} secs/run
+            </td>
+            <td class="bg-danger">{{ run_stats.run.count.test_command.success }} runs<br>
+                {{ run_stats.run.runtime.sum.test_command.success|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.test_command.success|round(2) }} secs/run
+            </td>
+            <td>{{ run_stats.run.count.test_command._all_ }} runs<br>
+                {{ run_stats.run.runtime.sum.test_command._all_|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg.test_command._all_|round(2) }} secs/run
+            </td>
+        </tr>
+        <tr>
+            <th class="active">sum</th>
+            <td>{{ run_stats.run.count._all_.failure }} runs<br>
+                {{ run_stats.run.runtime.sum._all_.failure|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg._all_.failure|round(2) }} secs/run
+            </td>
+            <td class="mpp-nochange">{{ run_stats.run.count._all_.nochange }} runs<br>
+                {{ run_stats.run.runtime.sum._all_.nochange|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg._all_.nochange|round(2) }} secs/run
+            </td>
+            <td class="mpp-timeout">{{ run_stats.run.count._all_.timeout }} runs<br>
+                {{ run_stats.run.runtime.sum._all_.timeout|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg._all_.timeout|round(2) }} secs/run
+            </td>
+            <td>{{ run_stats.run.count._all_.success }} runs<br>
+                {{ run_stats.run.runtime.sum._all_.success|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg._all_.success|round(2) }} secs/run
+            </td>
+            <td>{{ run_stats.run.count._all_._all_ }} runs<br>
+                {{ run_stats.run.runtime.sum._all_._all_|round(2) }} secs<br>
+                {{ run_stats.run.runtime.avg._all_._all_|round(2) }} secs/run
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <a class="btn btn-danger btn-sm" role="button"
+       href="{{ url_for('route_v2_project_project_id_delete', project_id=project.id) }}">delete
+        project</a>
+
+{% endblock %}

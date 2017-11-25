@@ -1,0 +1,18 @@
+{% extends "v2_base.html" %}
+{% set title='Mutators' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item active">Mutators</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Mutators</h1>
+    <ul>
+    {% for mutator in mutators|sort %}
+        <li><a href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=mutator) }}">{{ mutator }}</a></li>
+    {% endfor %}
+    </ul>
+{% endblock %}

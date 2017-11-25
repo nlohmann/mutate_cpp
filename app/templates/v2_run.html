@@ -1,0 +1,45 @@
+{% extends "v2_base.html" %}
+{% set title='Run ' + run.id|string %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item"><a
+                href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id) }}">Patches</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=patch.id) }}">Patch {{ patch.id }}</a></li>
+        <li class="breadcrumb-item active">Run {{ run.id }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1>Run {{ run.id }}</h1>
+
+    <table class="table table-sm">
+        <thead>
+        <tr>
+            <th>run</th>
+            <th>duration</th>
+            <th>command</th>
+            <th>success</th>
+            <th>log</th>
+        </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ run.id }}</td>
+                <td>{{ run.duration|round(2) }}</td>
+                <td>{{ run.command }}</td>
+                <td>{{ run.success }}</td>
+                <td>{{ run.log }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <span class="badge badge-dark w-100">{{ run.timestamp_start }}</span>
+    <pre class="bg-light"><code class="nohighlight">{{ run.output|string }}</code></pre>
+    <span class="badge badge-dark w-100">{{ run.timestamp_end }}</span>
+
+{% endblock %}

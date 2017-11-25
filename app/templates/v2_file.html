@@ -1,0 +1,17 @@
+{% extends "v2_base.html" %}
+{% set title='File ' + file.filename|basename %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_projects') }}">Projects</a></li>
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a></li>
+        <li class="breadcrumb-item active">{{ file.filename|basename }}</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <pre>
+        <code class="cpp">{{ file.content }}</code>
+    </pre>
+{% endblock %}

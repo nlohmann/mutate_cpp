@@ -1,0 +1,22 @@
+{% extends "v2_base.html" %}
+{% set title='Home' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item active">Home</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <ul class="fa-ul">
+        <li><i class="fa-li fa fa-cubes" aria-hidden="true"></i>
+            <a href="{{ url_for('route_v2_projects') }}">Projects</a>
+        </li>
+        <li><i class="fa-li fa fa-list-ol" aria-hidden="true"></i>
+            <a href="{{ url_for('route_v2_queue') }}">Queue</a>
+        </li>
+        <li><i class="fa-li fa fa-group" aria-hidden="true"></i>
+            <a href="{{ url_for('route_v2_mutators') }}">Mutators</a>
+        </li>
+    </ul>
+{% endblock %}

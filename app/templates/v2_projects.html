@@ -1,0 +1,45 @@
+{% extends "v2_base.html" %}
+{% set title='Projects' %}
+
+{% block breadcrumb %}
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('route_v2_root') }}">Home</a></li>
+        <li class="breadcrumb-item active">Projects</li>
+    </ol>
+{% endblock %}
+
+{% block content %}
+    <h1 class="mb-3">Projects</h1>
+
+    <div class="row">
+        {% for project in projects %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h4 class="card-title"><i class="fa fa-cube"></i> <a
+                                href="{{ url_for('route_v2_project_project_id', project_id=project.id) }}">{{ project.name }}</a>
+                        </h4>
+                        <p class="card-text">
+                            {{ project.files.count() }} files, <a href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id) }}">{{ project.patches.count() }} patches</a><br>
+                            <a href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='survived') }}">{{ project.findings }} findings</a><br>
+                            {% set last_finding = project.last_finding %}
+                            {% if last_finding %}
+                            last finding {{ project.last_finding|humanize }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 bg-light">
+                <div class="card-body">
+                    <h4 class="card-title"><i class="fa fa-plus-circle"></i> <a
+                            href="{{ url_for('route_v2_projects_create') }}">New Project</a></h4>
+                    <p class="card-text">Create a new project.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
