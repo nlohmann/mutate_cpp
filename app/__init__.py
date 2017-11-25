@@ -14,4 +14,5 @@ db = SQLAlchemy(app)
 
 humanize = Humanize(app)
 
+# noinspection PyPep8
 from app import views, models

@@ -28,6 +28,7 @@ class Project(db.Model):
     def last_finding(self):
         return self.patches.filter(Patch.state == 'survived').order_by(Patch.id.desc()).first().runs[-1].timestamp_end
 
+
 class File(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     filename = db.Column(db.Text)
@@ -60,6 +61,7 @@ class Patch(db.Model):
     @property
     def killed_stage(self):
         """return the first unsuccessful run's command"""
+        # noinspection PyPep8
         return self.runs.filter(Run.success == False).first().command
 
     @property
