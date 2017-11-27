@@ -34,8 +34,8 @@ After checking out the sources from this repository, you need to create a
 [virtual environment](https://docs.python.org/3/tutorial/venv.html) and install the required packages:
 
 ```bash
-virtualenv -p python3 venv
-venv/bin/pip install -r requirements
+python3 -m venv venv
+venv/bin/pip install -r requirements.txt
 ```
 
 Next, we need to create a database where mutations and the results are stored:
