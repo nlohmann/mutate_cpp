@@ -4,7 +4,7 @@ import shlex
 import subprocess
 from threading import Timer, Thread
 import psutil
-from app.models import Patch, Run
+from app.models import Patch, Run, File
 import tempfile
 import os
 import datetime
@@ -74,33 +74,37 @@ class Executor:
 
     def workflow(self, patch: Patch):
         assert self.__current_patch is None, 'no auto-concurrency!'
-        self.__current_patch = patch
+        
+        file = File.query.get(patch.file_id)
+        
+        if file is not None:
+            self.__current_patch = patch
 
-        # step 1: write patch to temp file
-        patchfile = tempfile.NamedTemporaryFile(delete=False, mode='w')
-        patchfile.write(patch.patch)
-        patchfile.close()
+            # step 1: write patch to temp file
+            patchfile = tempfile.NamedTemporaryFile(delete=False, mode='w')
+            patchfile.write(patch.patch)
+            patchfile.close()
 
-        # step 2: apply patch
-        self.__execute_command_timeout('patch -p1 --input={patchfile}'.format(patchfile=patchfile.name), cwd='/')
+            # step 2: apply patch
+            self.__execute_command_timeout('patch -p1 --input={patchfile} {inputfile}'.format(patchfile=patchfile.name, inputfile=file.filename), cwd='/')
 
-        # step 3: command pipeline
-        success = self.__apply_command(patch, 'build_command') and \
-                  self.__apply_command(patch, 'quickcheck_command') and \
-                  self.__apply_command(patch, 'test_command')
+            # step 3: command pipeline
+            success = self.__apply_command(patch, 'build_command') and \
+                      self.__apply_command(patch, 'quickcheck_command') and \
+                      self.__apply_command(patch, 'test_command')
 
-        if success:
-            patch.state = 'survived'
-            db.session.commit()
+            if success:
+                 patch.state = 'survived'
+                 db.session.commit()
 
-        # step 4: revert patch
-        self.__execute_command_timeout('patch -p1 --reverse --input={patchfile}'.format(patchfile=patchfile.name),
+            # step 4: revert patch
+            self.__execute_command_timeout('patch -p1 --reverse --input={patchfile} {inputfile}'.format(patchfile=patchfile.name, inputfile=file.filename),
                                        cwd='/')
 
-        # step 6: delete patch file
-        os.remove(patchfile.name)
+            # step 6: delete patch file
+            os.remove(patchfile.name)
 
-        self.__current_patch = None
+            self.__current_patch = None
 
     def __apply_command(self, patch: Patch, step: str):
         print(patch, step)

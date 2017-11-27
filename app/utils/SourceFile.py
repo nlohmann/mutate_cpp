@@ -117,14 +117,14 @@ class SourceFile:
         ))
 
         # lines: context before
-        patch_lines += [' ' + x + '\n' for x in context_before]
+        patch_lines += [' ' + x + "\r\n" for x in context_before]
         # line: the old value
-        patch_lines.append('-' + old_line + '\n')
+        patch_lines.append('-' + old_line + "\r\n")
         # line: the new value
         if replacement.new_val is not None:
-            patch_lines.append('+' + new_line + '\n')
+            patch_lines.append('+' + new_line + "\r\n")
         # lines: context after
-        patch_lines += [' ' + x + '\n' for x in context_after]
+        patch_lines += [' ' + x + "\r\n" for x in context_after]
 
         patch_text = ''.join(patch_lines)
         return patch_text
