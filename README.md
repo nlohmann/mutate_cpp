@@ -35,7 +35,7 @@ After checking out the sources from this repository, you need to create a
 
 ```bash
 virtualenv -p python3 venv
-venv/bin/pip install -r requirements
+venv/bin/pip install -r requirements.txt
 ```
 
 Next, we need to create a database where mutations and the results are stored:
