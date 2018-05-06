@@ -130,7 +130,7 @@ empty.
 ![Workflow](doc/4_add_file.png)
 
 - Click on ["Add file"](http://127.0.0.1:5000/projects/1/files/add).
-- In the "Add file to project" dialog, enter the filename `/private/tmp/cmake-example/src/example.cpp`.
+- In the "Add file to project" dialog, enter the filename `/tmp/cmake-example/src/example.cpp`.
 - Click "Add file".
 
 We are back in the [project overview](http://127.0.0.1:5000/projects/1), but see `example.cpp` added to the files. When
@@ -183,7 +183,7 @@ Now it is time to actually apply the patches:
 ![Workflow](doc/8_queue_running.png)
 
 What happened? Mutate++ executed the workflow described above for each patch. That is, it applied the patch to the
-source file `/private/tmp/cmake-example/src/example.cpp`, executed the build command `make` in the working directory
+source file `/tmp/cmake-example/src/example.cpp`, executed the build command `make` in the working directory
 `/tmp/cmake-example/build`, and then executed the test command `ctest` in the same directory. As we have a trivial
 project with just 14 patches, this is just a matter of seconds.
 
@@ -209,7 +209,7 @@ see the list of survived patches. We see that patch 14 survived. Click on
 
 In the patch overview, we see what happened:
 
-- The patch deleted line 16 of file `/private/tmp/cmake-example/src/example.cpp`, resulting in function
+- The patch deleted line 16 of file `/tmp/cmake-example/src/example.cpp`, resulting in function
   `multiply_numbers` not returning anything.
 - In the run overview, we see the individual steps of the workflow:
   - [Run 22](http://127.0.0.1:5000/projects/1/patches/14/runs/22) shows the output of the build command. Maybe some
