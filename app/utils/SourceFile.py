@@ -1,7 +1,7 @@
 # coding=utf-8
 
 from app import db
-import os.path
+import os
 from datetime import datetime
 from app.utils.Mutation import get_mutators
 from app.utils.Replacement import Replacement
@@ -106,25 +106,25 @@ class SourceFile:
         patch_lines = []
 
         # first line: we want to change the source file
-        patch_lines.append('--- {filename} {date}\n'.format(filename=self.filename, date=original_file_date))
+        patch_lines.append('--- {filename} {date}'.format(filename=self.filename, date=original_file_date) + os.linesep)
         # second line: the new file has the same name, but is changed now
-        patch_lines.append('+++ {filename} {date}\n'.format(filename=self.filename, date=datetime.now()))
+        patch_lines.append('+++ {filename} {date}'.format(filename=self.filename, date=datetime.now()) + os.linesep)
         # third line: summarize the changes regarding to displayed lines
-        patch_lines.append('@@ -{lineno},{context_length} +{lineno},{context_length_shortened} @@\n'.format(
+        patch_lines.append('@@ -{lineno},{context_length} +{lineno},{context_length_shortened} @@'.format(
             lineno=line_number - len(context_before),
             context_length=len(context_before) + len(context_after) + 1,
             context_length_shortened=len(context_before) + len(context_after) + (1 if new_line else 0)
-        ))
+        ) + os.linesep)
 
         # lines: context before
-        patch_lines += [' ' + x + "\r\n" for x in context_before]
+        patch_lines += [' ' + x + os.linesep for x in context_before]
         # line: the old value
-        patch_lines.append('-' + old_line + "\r\n")
+        patch_lines.append('-' + old_line + os.linesep)
         # line: the new value
         if replacement.new_val is not None:
-            patch_lines.append('+' + new_line + "\r\n")
+            patch_lines.append('+' + new_line + os.linesep)
         # lines: context after
-        patch_lines += [' ' + x + "\r\n" for x in context_after]
+        patch_lines += [' ' + x + os.linesep for x in context_after]
 
         patch_text = ''.join(patch_lines)
         return patch_text
