@@ -1,7 +1,7 @@
 appdirs==1.4.3
 click==6.7
 decorator==4.1.2
-Flask==0.12.3
+Flask==1.0
 Flask-Compress==1.4.0
 Flask-Humanize==0.3.0
 Flask-SQLAlchemy==2.2
