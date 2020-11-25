@@ -69,6 +69,8 @@ class SourceFile:
             # recognize the beginning of a line comment
             if line_stripped.startswith('/*'):
                 in_comment = True
+                if line_stripped.endswith('*/'):
+                    in_comment = False
                 continue
 
             # skip assertions
