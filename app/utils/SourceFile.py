@@ -14,8 +14,6 @@ class SourceFile:
         self.filename = file.filename
         self.full_content = [x.rstrip() for x in file.content.split('\n')]
 
-        print(first_line, last_line)
-
         # the line numbers stored here are human-readable; to use them as indices to
         # self.full_content, we need to subtract -1
         self.first_line = first_line

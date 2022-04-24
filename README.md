@@ -9,6 +9,7 @@ by the test suite, the "survived" mutation can be used to create an additional t
 - [Installation](#installation)
 - [Example](#example)
 - [Further features](#further-features)
+- [Command-line tools](#command-line-tools)
 - [Help!](#help)
 - [Used third-party tools](#used-third-party-tools)
 - [License](#license)
@@ -251,6 +252,43 @@ In the [project overview](http://127.0.0.1:5000/projects/1), you also get some s
   avoid waiting for such a false positive, Mutate++ can stop the evaluation of such patches if the test command or
   quickcheck command return exit code `77`.
 
+
+## Command-line tools
+
+Mutate++ provides some command-line scripts to facilitate its usage without the web interface.
+These scripts can be found in the `cli` directory, and should be run from the root directory.
+
+### `create_project.py`
+This script will create a project and add it to the database.
+
+Example usage:
+```bash
+venv/bin/python3 cli/create_project.py --name "Example project" --workdir "/tmp/cmake-example/build" --build-command "make" --test-command "ctest"
+```
+
+### `add_files.py`
+This script will add files to an existing project.
+
+Example usage:
+```bash
+venv/bin/python3 cli/add_files.py --project "Example project" /tmp/cmake-example/src/*.cpp
+```
+
+### `generate_patches.py`
+This script will generate patches for all files in a project.
+
+Example usage:
+```bash
+venv/bin/python3 cli/generate_patches.py --project "Example project"
+```
+
+### `queue_control.py`
+This script allows you to control the queue and view its state.
+
+Example usage:
+```bash
+venv/bin/python3 cli/queue_control.py start
+```
 
 ## Help!
 
