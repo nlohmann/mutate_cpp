@@ -2,9 +2,26 @@
 
 import json
 import re
-from typing import Dict, List
+from typing import Dict, List, Tuple
 from app.utils.Replacement import Replacement
 
+
+class StringLiteralFinder:
+    def __init__(self, line):
+        self.string_literals = []  # type: List[Tuple[int, int]]
+
+        for match in re.finditer(re.compile("\".*?\""), line):
+            self.string_literals.append(match.span())
+
+    def is_in_string_literal(self, index):
+        for (string_start, string_end) in self.string_literals:
+            if string_start < index < string_end:
+                return True
+
+        return False
+
+
+##############################################################################
 
 class SimplePattern:
     def __init__(self, replacement_patterns):
@@ -13,8 +30,13 @@ class SimplePattern:
     def mutate(self, line):
         result = []  # type: List[Replacement]
 
+        string_finder = StringLiteralFinder(line)
+
         for replacement_pattern in self.replacement_patterns.keys():
             for occurrence in [match for match in re.finditer(re.compile(replacement_pattern), line)]:
+                if string_finder.is_in_string_literal(occurrence.start()):
+                    continue
+
                 for replacement_str in self.replacement_patterns[replacement_pattern]:
                     result.append(Replacement(start_col=occurrence.start(),
                                               end_col=occurrence.end(),
@@ -244,7 +266,12 @@ class DecimalNumberLiteralMutator:
     def find_mutations(self, line):
         result = []  # type: List[Replacement]
 
+        string_finder = StringLiteralFinder(line)
+
         for occurrence in [match for match in re.finditer(re.compile(self.regex), line)]:
+            if string_finder.is_in_string_literal(occurrence.start()):
+                continue
+
             number_str = occurrence.group(1)
 
             # use JSON as means to cope with both int and double
@@ -274,7 +301,12 @@ class HexNumberLiteralMutator:
     def find_mutations(self, line):
         result = []  # type: List[Replacement]
 
+        string_finder = StringLiteralFinder(line)
+
         for occurrence in [match for match in re.finditer(re.compile(self.regex), line)]:
+            if string_finder.is_in_string_literal(occurrence.start()):
+                continue
+
             number_str = occurrence.group()
 
             # use JSON as means to cope with both int and double
