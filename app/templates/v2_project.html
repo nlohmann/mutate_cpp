@@ -142,17 +142,17 @@
                         <ul>
                             {% if run_stats.run.count._all_.failure %}
                             <li>
-                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.failure }} failure</a>
+                                <a class="bg-success text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='killed', run_state='failure') }}">{{ run_stats.run.count._all_.failure }} failure</a>
                             </li>
                             {% endif %}
                         {% if run_stats.run.count._all_.nochange %}
                             <li>
-                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.nochange }} nochange</a>
+                                <a class="bg-success text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='killed', run_state='nochange') }}">{{ run_stats.run.count._all_.nochange }} nochange</a>
                             </li>
                         {% endif %}
                         {% if run_stats.run.count._all_.timeout %}
                             <li>
-                                <a class="bg-success text-white" href="">{{ run_stats.run.count._all_.timeout }} timeout</a>
+                                <a class="bg-success text-white" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, patch_state='killed', run_state='timeout') }}">{{ run_stats.run.count._all_.timeout }} timeout</a>
                             </li>
                         {% endif %}
                         </ul>
