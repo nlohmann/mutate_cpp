@@ -31,7 +31,7 @@ def main():
     db.session.delete(project_query.first())
     db.session.commit()
 
-    print(f"Project '{project.project}' deleted successfully.")
+    print(f"Project '{arguments.project}' deleted successfully.")
     exit(0)
 
 
