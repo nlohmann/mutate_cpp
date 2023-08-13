@@ -31,7 +31,7 @@
     <p>todo: {{ executor.count }} patches</p>
 
     {% set stats = stats.run_stats() %}
-    {% set patch_finished_percentage = 100.0 * ((stats.patch.count._all_ - stats.patch.count.incomplete) / stats.patch.count._all_) %}
+    {% set patch_finished_percentage = 0.0 if stats.patch.count._all_ == 0 else 100.0 * ((stats.patch.count._all_ - stats.patch.count.incomplete) / stats.patch.count._all_) %}
 
     <div class="progress">
         <div class="progress-bar{{ additional_bar_class }}" role="progressbar" style="width: {{ patch_finished_percentage }}%">
