@@ -93,6 +93,8 @@ class Executor:
                       self.__apply_command(patch, 'quickcheck_command') and \
                       self.__apply_command(patch, 'test_command')
 
+            self.__apply_command(patch, 'clean_command')
+
             if success:
                  patch.state = 'survived'
                  db.session.commit()
