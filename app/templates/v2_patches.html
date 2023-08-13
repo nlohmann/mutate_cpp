@@ -22,6 +22,7 @@
         <thead>
         <tr>
             <th>patch</th>
+            <th>file</th>
             <th>line</th>
             <th>kind</th>
             <th>state</th>
@@ -32,8 +33,9 @@
         {% for patch in patches.items %}
             <tr>
                 <td>
-                    <a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=patch.id) }}">{{ patch.id }}</a>
+                    <a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=patch.id, filter_patch_state=filter_patch_state, filter_confirmation_state=filter_confirmation_state, filter_run_state=filter_run_state) }}">{{ patch.id }}</a>
                 </td>
+                <td>{{ patch.file.filename|basename }}</td>
                 <td>{{ patch.line }}</td>
                 <td><a href="{{ url_for('route_v2_mutators_mutator_id', mutator_id=patch.kind) }}">{{ patch.kind }}</a></td>
                 <td>
@@ -66,7 +68,7 @@
         <ul class="pagination">
             <li class="page-item{% if not patches.has_prev %} disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.prev_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">
+                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.prev_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state'), run_state=request.args.get('run_state')) }}">
                     <span>&laquo;</span>
                 </a>
             </li>
@@ -74,7 +76,7 @@
             {% for page in patches.iter_pages() %}
                 {% if page %}
                 <li class="page-item{% if page == patches.page %} active{% endif %}">
-                    <a class="page-link" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=page, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">{{ page }}</a>
+                    <a class="page-link" href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=page, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state'), run_state=request.args.get('run_state')) }}">{{ page }}</a>
                 </li>
                 {% else %}
                     <li class="page-item disabled">
@@ -85,7 +87,7 @@
 
             <li class="page-item{% if not patches.has_next %} disabled{% endif %}">
                 <a class="page-link"
-                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.next_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state')) }}">
+                   href="{{ url_for('route_v2_project_project_id_patches', project_id=project.id, page=patches.next_num, patch_state=request.args.get('patch_state'), confirmation_state=request.args.get('confirmation_state'), run_state=request.args.get('run_state')) }}">
                     <span>&raquo;</span>
                 </a>
             </li>

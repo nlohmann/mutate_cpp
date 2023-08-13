@@ -226,6 +226,7 @@ def route_v2_project_project_id_patches(project_id):
     page = int(request.args.get('page', 1))
     patch_state = request.args.get('patch_state')
     confirmation_state = request.args.get('confirmation_state')
+    run_state = request.args.get('run_state')
 
     # initial patch query
     patches = Patch.query.filter(Patch.project_id == project_id)
@@ -235,22 +236,32 @@ def route_v2_project_project_id_patches(project_id):
         patches = patches.filter(Patch.state == patch_state)
     if confirmation_state:
         patches = patches.filter(Patch.confirmation == confirmation_state)
+    if run_state:
+        patches = patches.join(Run).filter(Run.log == run_state)
 
     # add pagination
     patches = patches.paginate(page, app.config['ITEMS_PER_PAGE'], False)
 
-    return render_template('v2_patches.html', project=project, patches=patches)
+    return render_template('v2_patches.html', project=project, patches=patches, filter_patch_state=patch_state,
+                           filter_confirmation_state=confirmation_state, filter_run_state=run_state)
 
 
 @app.route('/projects/<int:project_id>/patches/<int:patch_id>', methods=['GET', 'POST'])
 def route_v2_project_project_id_patches_patch_id(project_id, patch_id):
+    # retrieve project
     project = Project.query.get(project_id)
     if project is None:
         abort(404)
 
+    # retrieve patch
     patch = Patch.query.get(patch_id)
     if patch is None:
         abort(404)
+
+    # retrieve parameters
+    filter_patch_state = request.args.get('filter_patch_state')
+    filter_confirmation_state = request.args.get('filter_confirmation_state')
+    filter_run_state = request.args.get('filter_run_state')
 
     form = SetConfirmationForm()
 
@@ -260,7 +271,22 @@ def route_v2_project_project_id_patches_patch_id(project_id, patch_id):
         patch.confirmation = form.confirmation.data
         db.session.commit()
 
-    return render_template('v2_patch.html', project=project, patch=patch, form=form)
+    # retrieve previous and next patch id
+    filtered_patches = Patch.query
+    if filter_patch_state:
+        filtered_patches = filtered_patches.where(Patch.state == filter_patch_state)
+    if filter_confirmation_state:
+        filtered_patches = filtered_patches.where(Patch.confirmation == filter_confirmation_state)
+    if filter_run_state:
+        filtered_patches = filtered_patches.join(Run).filter(Run.log == filter_run_state)
+
+    previous_patch = filtered_patches.where(Patch.id < patch.id).order_by(Patch.id.desc()).first()
+
+    next_patch = filtered_patches.where(Patch.id > patch.id).order_by(Patch.id).first()
+
+    return render_template('v2_patch.html', project=project, patch=patch, form=form,
+                           filter_patch_state=filter_patch_state, filter_confirmation_state=filter_confirmation_state,
+                           filter_run_state=filter_run_state, previous_patch=previous_patch, next_patch=next_patch)
 
 
 @app.route('/projects/<int:project_id>/files/<int:file_id>/generate', methods=['GET', 'POST'])
@@ -332,4 +358,3 @@ def route_v2_mutators_mutator_id(mutator_id):
         abort(404)
 
     return render_template('v2_mutator.html', mutator=mutator, patches=patches)
-

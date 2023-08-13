@@ -14,6 +14,21 @@
 {% endblock %}
 
 {% block content %}
+
+    <div class="d-flex justify-content-between">
+        {% if previous_patch is not none %}
+            <span><a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=previous_patch.id, filter_patch_state=filter_patch_state, filter_confirmation_state=filter_confirmation_state, filter_run_state=filter_run_state) }}">&laquo; Patch {{ previous_patch.id }}</a></span>
+        {% else %}
+            <span></span>
+        {% endif %}
+
+        {% if next_patch is not none %}
+            <span><a href="{{ url_for('route_v2_project_project_id_patches_patch_id', project_id=project.id, patch_id=next_patch.id, filter_patch_state=filter_patch_state, filter_confirmation_state=filter_confirmation_state, filter_run_state=filter_run_state) }}">Patch {{ next_patch.id }} &raquo;</a></span>
+        {% else %}
+        <span></span>
+        {% endif %}
+    </div>
+
     <h1>Patch {{ patch.id }}</h1>
 
     <h2>Patch</h2>
