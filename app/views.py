@@ -122,6 +122,47 @@ def route_v2_projects_create():
 
     return render_template('v2_create_project.html', form=form)
 
+@app.route('/projects/edit/<int:project_id>', methods=['GET', 'POST'])
+def route_v2_projects_edit(project_id):
+    form = CreateProjectForm()
+    project = Project.query.get(project_id)
+
+    
+    if project is None:
+        abort(403)
+        return
+
+    if not form.validate_on_submit():
+        # Copy from DB to form
+        form.name.data = project.name
+        form.workdir.data = project.workdir
+        form.build_command.data = project.build_command
+        form.quickcheck_command.data = project.quickcheck_command
+        form.quickcheck_timeout.data = project.quickcheck_timeout
+        form.test_command.data = project.test_command
+        form.test_timeout.data = project.test_timeout
+        form.clean_command.data = project.clean_command
+        for field, error_msg in form.errors.items():
+            flash('Error in field "{field}": {error_msg}'.format(
+                field=field,
+                error_msg=' '.join(error_msg)
+            ), category='error')
+
+        return render_template('v2_edit_project.html', form=form)
+
+    # Copy from form to DB
+    project.name = form.name.data
+    project.workdir = form.workdir.data
+    project.build_command = form.build_command.data
+    project.quickcheck_command = form.quickcheck_command.data
+    project.quickcheck_timeout = form.quickcheck_timeout.data
+    project.test_command = form.test_command.data
+    project.test_timeout = form.test_timeout.data
+    project.clean_command = form.clean_command.data
+    db.session.commit()
+    return redirect(url_for('route_v2_project_project_id', project_id=project.id))
+
+
 
 @app.route('/projects/<int:project_id>')
 def route_v2_project_project_id(project_id):

@@ -27,6 +27,7 @@
                             last finding {{ project.last_finding|humanize }}
                             {% endif %}
                         </p>
+                        <a href="{{ url_for('route_v2_projects_edit', project_id=project.id) }}" class="btn btn-primary btn-sm float-right"><i class="fa fa-edit"></i> Edit</a>
                     </div>
                 </div>
             </div>
