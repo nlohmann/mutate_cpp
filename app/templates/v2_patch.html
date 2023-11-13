@@ -63,17 +63,10 @@
 
     <form action="" method="post" name="project">
         {{ form.hidden_tag() }}
-
-        {% for x in form.confirmation %}
-            <div class="form-check">
-                <label class="form-check-label">
-                    {{ x }} {{ x.data }}
-                </label>
-            </div>
+        {% for choice, label in form.confirmation.choices %}
+            <button type="submit" class="btn {% if choice == form.confirmation.data %}btn-primary focus active{%else%}btn-outline-secondary{% endif %}" name="confirmation" value="{{ choice }}">{{ label }}</button>
         {% endfor %}
-
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </form>
+    </form>    
 
     <h2>Runs</h2>
     <table class="table table-sm">
